@@ -146,8 +146,21 @@ if st.button("Submit", type="primary"):
                     f"Status code: {response.status_code}"
                 )
 
-        except requests.exceptions.RequestException:
+        except requests.exceptions.Timeout:
             st.error(
-                "Unable to connect to the RAG API. "
-                "Please make sure the backend service is running."
+                "The RAG API request timed out. The backend may still be starting "
+                "or generating the answer. Please try again shortly."
             )
+        except requests.exceptions.ConnectionError:
+            st.error(
+                "Unable to connect to the RAG API. Please check the backend service "
+                "and the container network configuration."
+            )
+            st.caption(
+                "For separate Docker containers in Codespaces, start the frontend "
+                "with --add-host=host.docker.internal:host-gateway and publish "
+                "backend port 7860, or set BACKEND_URL to the backend container's "
+                "address on a shared Docker network."
+            )
+        except requests.exceptions.RequestException:
+            st.error("The request to the RAG API failed. Check the backend logs.")
